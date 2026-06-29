@@ -3,6 +3,7 @@ import sys
 import cv2
 import mediapipe as mp
 import json
+import math
 
 
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -19,6 +20,9 @@ def analyze_face(image_path):
             "message": "画像を読み込めませんでした",
             "path": image_path
         }
+
+    # 画像サイズを取得
+    image_height, image_width, _ = image.shape
 
     # モデルファイルがあるか確認
     if not os.path.exists(model_path):
@@ -63,9 +67,28 @@ def analyze_face(image_path):
     left_cheek = landmarks[234]   # 左頬
     right_cheek = landmarks[454]  # 右頬
 
-    # 顔の縦幅・横幅を計算
-    face_height = abs(chin.y - forehead.y)
-    face_width = abs(right_cheek.x - left_cheek.x)
+    # MediaPipeの0〜1座標をピクセル座標に変換
+    def to_pixel(point):
+        return {
+            "x": point.x * image_width,
+            "y": point.y * image_height
+        }
+
+    forehead_px = to_pixel(forehead)
+    chin_px = to_pixel(chin)
+    left_cheek_px = to_pixel(left_cheek)
+    right_cheek_px = to_pixel(right_cheek)
+
+    # 顔の縦幅・横幅をピクセル距離で計算
+    face_height = math.sqrt(
+        (chin_px["x"] - forehead_px["x"]) ** 2 +
+        (chin_px["y"] - forehead_px["y"]) ** 2
+    )
+
+    face_width = math.sqrt(
+        (right_cheek_px["x"] - left_cheek_px["x"]) ** 2 +
+        (right_cheek_px["y"] - left_cheek_px["y"]) ** 2
+    )
 
     # 横幅が0の場合のエラー対策
     if face_width == 0:
@@ -78,9 +101,9 @@ def analyze_face(image_path):
     face_ratio = face_height / face_width
 
     # 顔型判定
-    if face_ratio >= 1.45:
+    if face_ratio >= 1.25:
         face_shape = "面長"
-    elif face_ratio <= 1.25:
+    elif face_ratio <= 1.15:
         face_shape = "丸顔"
     else:
         face_shape = "卵型"
@@ -97,6 +120,8 @@ def analyze_face(image_path):
         "success": True,
         "face_shape": face_shape,
         "face_ratio": round(face_ratio, 3),
+        "face_height": round(face_height, 1),
+        "face_width": round(face_width, 1),
         "recommendations": recommendations_map.get(face_shape, [])
     }
 
