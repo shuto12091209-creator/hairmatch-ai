@@ -101,9 +101,12 @@ def analyze_face(image_path):
     face_ratio = face_height / face_width
 
     # 顔型判定
-    if face_ratio >= 1.25:
+    FaceLength = 1.25
+    FaceWidth = 1.15
+
+    if face_ratio >= FaceLength:
         face_shape = "面長"
-    elif face_ratio <= 1.15:
+    elif face_ratio <= FaceWidth:
         face_shape = "丸顔"
     else:
         face_shape = "卵型"
