@@ -1,0 +1,12 @@
+# Python virtual environment
+python/venv/
+
+# Uploaded images
+app/uploads/*
+!app/uploads/.gitkeep
+# Python virtual environment
+python/venv/
+
+# Uploaded images
+app/uploads/*
+!app/uploads/.gitkeep

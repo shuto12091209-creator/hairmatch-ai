@@ -1,0 +1,19 @@
+ブラウザ
+      │
+      ▼
+PHP
+      │
+      ▼
+uploads
+      │
+      ▼
+Python(OpenCV)
+      │
+      ▼
+MediaPipe
+      │
+      ▼
+MySQL
+      │
+      ▼
+結果表示
